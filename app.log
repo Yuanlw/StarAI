@@ -1,0 +1,125 @@
+[2023-05-12 15:52:08,852] [ERROR] app: Exception on /login [POST]
+Traceback (most recent call last):
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/app.py", line 94, in login
+    user = User(name=name, user_password=password, mail=mail, business_type=0, create_time=datetime.now(), update_time=datetime.now())
+  File "<string>", line 4, in __init__
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/orm/state.py", line 567, in _initialize_instance
+    manager.dispatch.init_failure(self, args, kwargs)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/util/langhelpers.py", line 147, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/orm/state.py", line 564, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/orm/decl_base.py", line 2149, in _declarative_constructor
+    setattr(self, k, kwargs[k])
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 43, in user_password
+    self.user_password = encrypt_password(value)
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 43, in user_password
+    self.user_password = encrypt_password(value)
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 43, in user_password
+    self.user_password = encrypt_password(value)
+  [Previous line repeated 973 more times]
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 16, in encrypt_password
+    salt = os.urandom(16)
+RecursionError: maximum recursion depth exceeded while calling a Python object
+[2023-05-12 16:22:48,870] [ERROR] app: Exception on /login [POST]
+Traceback (most recent call last):
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/app.py", line 94, in login
+    user = User(name=name, user_password=password, mail=mail, business_type=0, create_time=datetime.now(), update_time=datetime.now())
+  File "<string>", line 4, in __init__
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/orm/state.py", line 567, in _initialize_instance
+    manager.dispatch.init_failure(self, args, kwargs)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/util/langhelpers.py", line 147, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/orm/state.py", line 564, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/orm/decl_base.py", line 2149, in _declarative_constructor
+    setattr(self, k, kwargs[k])
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 43, in user_password
+    self.user_password = encrypt_password(value)
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 43, in user_password
+    self.user_password = encrypt_password(value)
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 43, in user_password
+    self.user_password = encrypt_password(value)
+  [Previous line repeated 973 more times]
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 16, in encrypt_password
+    salt = os.urandom(16)
+RecursionError: maximum recursion depth exceeded while calling a Python object
+[2023-05-12 16:26:39,105] [ERROR] app: Exception on /login [POST]
+Traceback (most recent call last):
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/app.py", line 94, in login
+    user = User(name=name, user_password=password, mail=mail, business_type=0, create_time=datetime.now(), update_time=datetime.now())
+  File "<string>", line 4, in __init__
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/orm/state.py", line 567, in _initialize_instance
+    manager.dispatch.init_failure(self, args, kwargs)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/util/langhelpers.py", line 147, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/orm/state.py", line 564, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/orm/decl_base.py", line 2149, in _declarative_constructor
+    setattr(self, k, kwargs[k])
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 43, in user_password
+    self.user_password = encrypt_password(value)
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 43, in user_password
+    self.user_password = encrypt_password(value)
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 43, in user_password
+    self.user_password = encrypt_password(value)
+  [Previous line repeated 973 more times]
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 16, in encrypt_password
+    salt = os.urandom(16)
+RecursionError: maximum recursion depth exceeded while calling a Python object
+[2023-05-12 16:30:39,937] [ERROR] app: Exception on /login [POST]
+Traceback (most recent call last):
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/app.py", line 94, in login
+    user = User(name=name, user_password=password, mail=mail, business_type=0, create_time=datetime.now(), update_time=datetime.now())
+  File "<string>", line 4, in __init__
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/orm/state.py", line 567, in _initialize_instance
+    manager.dispatch.init_failure(self, args, kwargs)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/util/langhelpers.py", line 147, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/orm/state.py", line 564, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+  File "/Users/yuanlw/PycharmProjects/StarAI/venv/lib/python3.9/site-packages/sqlalchemy/orm/decl_base.py", line 2149, in _declarative_constructor
+    setattr(self, k, kwargs[k])
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 43, in user_password
+    self.user_password = encrypt_password(value)
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 43, in user_password
+    self.user_password = encrypt_password(value)
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 43, in user_password
+    self.user_password = encrypt_password(value)
+  [Previous line repeated 973 more times]
+  File "/Users/yuanlw/PycharmProjects/StarAI/star/user.py", line 16, in encrypt_password
+    salt = os.urandom(16)
+RecursionError: maximum recursion depth exceeded while calling a Python object
+[2023-05-12 16:31:08,199] [INFO] app: IwiFbq
