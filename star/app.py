@@ -43,7 +43,7 @@ def login():
     password = request.json.get("password", None)
 
     # 对用户名和密码进行验证，这里简单起见不做演示
-    user = user_dao.get_user_by_id(userId)
+    user = user_dao.get_by_id(userId)
     if user is None:
         return jsonify({'error': 'login required'}), 401
 
@@ -72,7 +72,7 @@ def register():
         return jsonify({'error': 'Invalid mail format'}), 400
 
     # 判断邮箱是否已注册
-    reUser = user_dao.get_users_by_mail(mail=mail)
+    reUser = user_dao.get_list(mail=mail)
     if reUser:
         user_dict = reUser.__getitem__(0).as_dict()
         return jsonify(user_dict), 200
@@ -87,7 +87,7 @@ def register():
 
     # 保存用户信息
     try:
-        user_dao.add_user(user)
+        user_dao.add(user)
     except IntegrityError:
         return jsonify({'error': 'Mail has been registered'}), 400
 
@@ -112,7 +112,7 @@ def get_user():
     user_id = get_jwt_identity()
     logger.info(user_id)
     # 查询用户信息
-    user = user_dao.get_user_by_id(user_id)
+    user = user_dao.get_by_id(user_id)
 
     # 判断用户是否存在
     if not user:
@@ -139,7 +139,9 @@ async def question():
     if not user_id or not question:
         return jsonify({"error": "user_id and question are required"}), 400
     #
-    # # 敏感词过滤 TODO
+    # # 敏感词过滤
+    if contains_sensitive_words(question):
+        return jsonify({"answer": "含有敏感词"})
     #
     answers = chatGPT(question)
     awaitable = asyncio.ensure_future(answers)  # 包装为awaitable对象
@@ -221,7 +223,7 @@ def contains_sensitive_words(text):
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data['sub']
-    return user_dao.get_user_by_id(identity)
+    return user_dao.get_by_id(identity)
 
 
 if __name__ == '__main__':
