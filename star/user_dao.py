@@ -6,8 +6,11 @@ from star.user import User
 
 from star.user import User
 from functools import wraps
+
 # 创建 Session 工厂
 session_factory = sessionmaker(autocommit=False, expire_on_commit=True)
+session = scoped_session(session_factory)
+session.configure(bind=engine)
 
 
 def reconnect(func):
@@ -24,14 +27,14 @@ def reconnect(func):
                 return func(*args, **kwargs)
             else:
                 raise
+
     return wrapper
 
 
 # 定义 UserDAO 操作类
 class UserDAO:
     def __init__(self, engine):
-        self.session = scoped_session(session_factory)
-        self.session.configure(bind=engine)
+        self.session = session
 
     def __enter__(self):
         return self
@@ -42,8 +45,12 @@ class UserDAO:
     # 添加新用户
     @reconnect
     def add(self, user):
-        with self.session.begin():
+        try:
             self.session.add(user)
+            self.session.commit()
+        except Exception as e:
+            self.session.rollback()  # 回滚事务
+            raise e
 
     # 根据 ID 查询用户
     @reconnect
@@ -69,8 +76,12 @@ class UserDAO:
     # 删除用户
     @reconnect
     def delete(self, user):
-        with self.session.begin():
+        try:
             self.session.delete(user)
+            self.session.commit()
+        except Exception as e:
+            self.session.rollback()  # 回滚事务
+            raise e
 
     # 关闭数据库会话
 
