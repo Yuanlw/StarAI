@@ -33,9 +33,8 @@ class User(Base):
     update_time = Column(DateTime, nullable=False, default=datetime.now, onupdate='CURRENT_TIMESTAMP',
                          comment='更新时间')
 
-
-
-
+    def as_dict(self):
+        return {'id': str(self.id), 'name': self.name}
 
     def __repr__(self):
         return f'<User {self.id}: {self.name}>'

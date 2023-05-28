@@ -1,26 +1,57 @@
-from sqlalchemy.orm import sessionmaker
-from user import User
+from sqlalchemy.dialects.mysql import pymysql
+from sqlalchemy.orm import scoped_session, sessionmaker
 
+from star.database import engine
+from star.user import User
+
+from star.user import User
+from functools import wraps
 # 创建 Session 工厂
-Session = sessionmaker()
+session_factory = sessionmaker(autocommit=False, expire_on_commit=True)
 
-# 定义 ORM 操作
+
+def reconnect(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except pymysql.err.OperationalError as e:
+            # Error code 2013 represents "Lost connection to MySQL server during query"
+            if e.args[0] == 2013:
+                self = args[0]
+                self.session.remove()
+                self.session.configure(bind=engine)
+                return func(*args, **kwargs)
+            else:
+                raise
+    return wrapper
+
+
+# 定义 UserDAO 操作类
 class UserDAO:
     def __init__(self, engine):
-        # 创建会话工厂
-        Session.configure(bind=engine)
-        self.session = Session()
+        self.session = scoped_session(session_factory)
+        self.session.configure(bind=engine)
 
- # 添加新用户
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.session.remove()
+
+    # 添加新用户
+    @reconnect
     def add(self, user):
-        self.session.add(user)
-        self.session.commit()
+        with self.session.begin():
+            self.session.add(user)
 
     # 根据 ID 查询用户
+    @reconnect
     def get_by_id(self, id):
         return self.session.query(User).filter_by(id=id).first()
 
     # 根据邮箱查询用户
+    @reconnect
     def get_list(self, mail=None, business_type=None):
         query = self.session.query(User)
         if mail:
@@ -30,13 +61,18 @@ class UserDAO:
         return query.all()
 
     # 更新用户信息
+    @reconnect
     def update(self, user):
-        # 如果用户未与 Session 相关联，则使用 merge 方法重新关联
-        if not self.session.is_active:
-            user = self.session.merge(user)
-        self.session.commit()
+        with self.session.begin():
+            self.session.merge(user)
 
     # 删除用户
+    @reconnect
     def delete(self, user):
-        self.session.delete(user)
-        self.session.commit()
+        with self.session.begin():
+            self.session.delete(user)
+
+    # 关闭数据库会话
+
+    def close(self):
+        self.session.close()
