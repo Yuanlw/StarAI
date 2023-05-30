@@ -45,19 +45,21 @@ class ChatDAO:
 
     # 添加对话记录
     @reconnect
-    def add_conversation(self, user_id, question, answer):
-        chat = Chat(user_id=user_id, chat_q=question, chat_a=answer)
+    def add_conversation(self, user_id, question, answer, type):
+        chat = Chat(user_id=user_id, chat_q=question, chat_a=answer, type=type)
         with ThreadPoolExecutor(max_workers=5) as executor:
             future = executor.submit(self.session.add, chat)
             future.result()
             future = executor.submit(self.session.commit)
             future.result()
 
-    # 查询对话记录
+    # 查询对话记录(默认type=0)
     @reconnect
     def get_conversations_by_user(self, user_id, offset=0, limit=10):
         with ThreadPoolExecutor(max_workers=5) as executor:
-            future = executor.submit(self.session.query(Chat).filter_by(user_id=user_id).order_by(Chat.create_time.desc()).offset(offset).limit(limit).all)
+            future = executor.submit(
+                self.session.query(Chat).filter_by(user_id=user_id, type=0).order_by(Chat.create_time.desc()).offset(
+                    offset).limit(limit).all)
             chats = future.result()
         return [chat.to_dict() for chat in chats]
 

@@ -6,22 +6,24 @@ import jieba
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 from flask import Flask, jsonify, request, session, render_template
-from sqlalchemy import create_engine, inspect,event
+from sqlalchemy import create_engine, inspect, event
 from functools import wraps
 from star.logger import logger
 from star.chat_dao import ChatDAO
 from star.chatgpt import chatGPT
+from star.mail_util import send_mail
+from star.password_util import encrypt_password, check_password
 from star.user import User
 from star.user_dao import UserDAO
 from star.logger import logger
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, current_user, get_jwt_identity
 from datetime import timedelta
 from star.database import engine
+
 # from flask_cors import CORS
 
 # 创建 Flask 实例
 app = Flask(__name__)
-
 
 user_dao = UserDAO(engine)
 chat_dao = ChatDAO(engine)
@@ -44,9 +46,12 @@ def login():
 
     # 对用户名和密码进行验证，这里简单起见不做演示
     user = user_dao.get_by_id(userId)
+    check = check_password(password, user.user_password)
+    logger.info(check)
+    # if not check:
+    #     return jsonify({'error': 'login required'}), 401
     if user is None:
         return jsonify({'error': 'login required'}), 401
-
     # 如果验证成功，就创建一个JWT token
     access_token = create_access_token(identity=userId)
 
@@ -82,18 +87,21 @@ def register():
 
     # 创建新用户
     name = mail.split('@')[0]
-    user = User(name=name, user_password=password, mail=mail, business_type=0, create_time=datetime.now(),
-                update_time=datetime.now())
+    # 发送密码到邮箱
+    send_status = send_mail(mail, password)
+    if not send_status:
+        return jsonify({'error': 'Failed to send mail'}), 500
 
+    # 密码加密
+    hashed = encrypt_password(password)
+    user = User(name=name, user_password=hashed, mail=mail, business_type=0, create_time=datetime.now(),
+                update_time=datetime.now())
     # 保存用户信息
     try:
         user_dao.add(user)
     except IntegrityError:
         return jsonify({'error': 'Mail has been registered'}), 400
 
-    # 发送密码到邮箱
-    # ... todo
-    # logger.get_logger(user_password)
     logger.info(password)
 
     # 返回用户信息
@@ -148,7 +156,7 @@ async def question():
     await awaitable  # 等待协程完成
     result = awaitable.result()  # 获取返回值
     # answers = "chatGPT(question)"
-    chat_dao.add_conversation(user_id, question, result)
+    chat_dao.add_conversation(user_id, question, result, 0)
     return jsonify({"answer": result})
 
 

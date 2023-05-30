@@ -12,6 +12,7 @@ class Chat(Base):
 
     id = Column(BigInteger, primary_key=True, autoincrement=True, comment='主键ID')
     user_id = Column(BigInteger, nullable=False, comment='用户id')
+    type = Column(BigInteger, nullable=False, comment='对话类型')
     chat_q = Column(String(255), nullable=False, comment='问题')
     chat_a = Column(String(32), nullable=False, comment='回答')
     create_time = Column(DateTime, nullable=False, default=datetime.now, comment='创建时间')
@@ -21,6 +22,7 @@ class Chat(Base):
         return {
             'id': self.id,
             'user_id': self.user_id,
+            'type': self.type,
             'chat_q': self.chat_q,
             'chat_a': self.chat_a,
             'create_time': str(self.create_time),
