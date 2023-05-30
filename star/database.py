@@ -18,7 +18,6 @@ engine = create_engine(
     echo=True
 )
 
-
 @event.listens_for(engine, 'checkout')
 def ping_connection(dbapi_connection, connection_record,
                     connection_proxy):
