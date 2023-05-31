@@ -63,6 +63,15 @@ class ChatDAO:
             chats = future.result()
         return [chat.to_dict() for chat in chats]
 
+    @reconnect
+    def get_conversations_by_type(self, user_id, type, offset=0, limit=10):
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            future = executor.submit(
+                self.session.query(Chat).filter_by(user_id=user_id, type=type).order_by(Chat.create_time.desc()).offset(
+                    offset).limit(limit).all)
+            chats = future.result()
+        return [chat.to_dict() for chat in chats]
+
     # 删除历史记录
     @reconnect
     def del_conversations_by_user(self, user_id):
