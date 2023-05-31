@@ -57,6 +57,12 @@ class UserDAO:
     def get_by_id(self, id):
         return self.session.query(User).filter_by(id=id).first()
 
+    # 查询用户信息，防止信息全部返回
+    def get_info_by_id(self, id):
+        return self.session.query(User).filter_by(id=id).with_entities(User.id, User.name, User.business_type,
+                                                                       User.count).first()
+
+
     # 根据邮箱查询用户
     @reconnect
     def get_list(self, mail=None, business_type=None):
@@ -70,6 +76,21 @@ class UserDAO:
     # 更新用户信息
     @reconnect
     def update(self, user):
+        with self.session.begin():
+            self.session.merge(user)
+
+    # 传参更新
+    def update_args(self, user_id, **kwargs):
+        user = self.session.query(User).filter_by(id=user_id).first()
+        for key, value in kwargs.items():
+            setattr(user, key, value)
+        with self.session.begin():
+            self.session.merge(user)
+
+    # 更新用户可用次数
+    def update_count(self, user_id):
+        user = self.session.query(User).filter_by(id=user_id).first()
+        user.count -= 1
         with self.session.begin():
             self.session.merge(user)
 
