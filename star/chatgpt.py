@@ -2,8 +2,9 @@ from star.logger import logger
 # chatGPT
 import openai
 
-#openai.api_key = "sk-**"
-#openai.api_base = "https://www.***.com/v1"
+
+
+
 
 
 def chatGPT(text):

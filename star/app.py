@@ -30,7 +30,8 @@ chat_dao = ChatDAO(engine)
 
 # 设置JWT secret key
 app.config["JWT_SECRET_KEY"] = "my_secret_key_star_ai_"
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=72)
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=720)
+
 
 # 初始化JWTManager
 jwt = JWTManager(app)
