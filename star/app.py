@@ -8,6 +8,9 @@ from sqlalchemy.exc import IntegrityError
 from flask import Flask, jsonify, request, session, render_template
 from sqlalchemy import create_engine, inspect, event
 from functools import wraps
+
+from star.business import Business
+from star.business_dao import BusinessDAO
 from star.logger import logger
 from star.chat_dao import ChatDAO
 from star.chatgpt import chatGPT
@@ -27,6 +30,7 @@ app = Flask(__name__)
 
 user_dao = UserDAO(engine)
 chat_dao = ChatDAO(engine)
+business_dao = BusinessDAO(engine)
 
 # 设置JWT secret key
 app.config["JWT_SECRET_KEY"] = "my_secret_key_star_ai_"
@@ -121,7 +125,7 @@ def get_user():
     user_id = get_jwt_identity()
     logger.info(user_id)
     # 查询用户信息
-    user = user_dao.get_by_id(user_id)
+    user = user_dao.get_info_by_id(user_id)
 
     # 判断用户是否存在
     if not user:
@@ -144,7 +148,17 @@ async def question():
     # user_id = current_user.get('userId')
     data = request.get_json()
     question = data.get('question')
-    # user_id = data.get('user_id')
+    user = user_dao.get_info_by_id(user_id)
+    if (user.business_type == 0 and user.count <= 0):
+        return jsonify({"error": "次数已用完"}), 200
+    if (user.business_type == 1):
+        business = business_dao.get_by_user_id(user_id)
+        if (business.count <= 0):
+            return jsonify({"error": "次数已用完"}), 200
+        today = datetime.today()
+        if (business.activity_time < today):
+            return jsonify({"error": "会员已过期"}), 200
+
     if not user_id or not question:
         return jsonify({"error": "user_id and question are required"}), 400
     #
@@ -158,6 +172,12 @@ async def question():
     result = awaitable.result()  # 获取返回值
     # answers = "chatGPT(question)"
     chat_dao.add_conversation(user_id, question, result, 0)
+
+    if (user.business_type == 0):
+        user_dao.update_count(user_id)
+    if (user.business_type == 1):
+        business_dao.update_count(user_id)
+
     return jsonify({"answer": result})
 
 
@@ -170,10 +190,6 @@ def clean():
     user_id = get_jwt_identity()
     logger.info(user_id)
     data = request.get_json()
-    logger.info(request)
-    # userId = current_user.get('userId')
-    # logger.info(userId)
-    # user_id = data.get('userId')
     logger.info(user_id)
     if not user_id:
         return jsonify({"error": "user_id is required"}), 400
@@ -188,17 +204,14 @@ def clean():
 @app.route('/starai/conversations', methods=['GET'])
 @jwt_required()
 def conversations():
-    # user_id = session.get('userid')
-    # data = request.get_json()
     user_id = get_jwt_identity()
-    logger.info(user_id)
-    # user_id = current_user.get('userId')
-    logger.info(user_id)
-    # user_id = request.args.get('userId')
-    logger.info(user_id)
+    data = request.get_json()
+    type = data.get('type')
+    if not type:
+        type = 0
     if not user_id:
         return jsonify({"error": "user_id is required"}), 400
-    conversations = chat_dao.get_conversations_by_user(user_id, 0, 10)
+    conversations = chat_dao.get_conversations_by_type(user_id, type, 0, 10)
     return jsonify({"conversations": conversations})
 
 
@@ -211,15 +224,43 @@ async def ask():
     for word in words:
         if word in sensitive_words:
             return jsonify({'敏感词': True})
-    answers = chatGPT(question)
-    awaitable = asyncio.ensure_future(answers)  # 包装为awaitable对象
-    await awaitable  # 等待协程完成
-    result = awaitable.result()  # 获取返回值
-    # answers = "chatGPT(question)"
+    # answers = chatGPT(question)
+    # awaitable = asyncio.ensure_future(answers)  # 包装为awaitable对象
+    # await awaitable  # 等待协程完成
+    # result = awaitable.result()  # 获取返回值
+    result = "chatGPT(question)"
     # chat_dao.add_conversation(user_id, question, result)
     return jsonify({"answer": result})
 
 
+
+'''
+POST /business
+{
+    "user_id": 1, 
+    "count": 10,
+    "business_type": 1,//默认捐赠
+    "pay_time": "2020-01-01 00:00:00",
+    "pay_money": 100,
+    "activity_time": "2020-12-31 23:59:59"
+}
+'''
+@app.route('/business', methods=['POST'])
+def add_business():
+    data = request.get_json()
+    business = Business(
+        user_id=data['user_id'],
+        count=data['count'],
+        business_type=data['business_type'],
+        pay_time=data['pay_time'],
+        pay_money=data['pay_money'],
+        activity_time=data['activity_time']
+    )
+    business_dao.add(business)
+    return jsonify(business.as_dict())
+
+
+# 敏感词
 def contains_sensitive_words(text):
     words = jieba.cut(text)
     for word in words:
@@ -232,7 +273,7 @@ def contains_sensitive_words(text):
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data['sub']
-    return user_dao.get_by_id(identity)
+    return user_dao.get_info_by_id(identity)
 
 
 if __name__ == '__main__':
