@@ -5,8 +5,6 @@ import openai
 
 
 
-
-
 def chatGPT(text):
     if len(text) == 0:
         return
